@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Walentynka</title>
+  <!-- Google Font for a playful handwritten look -->
+  <link href="https://fonts.googleapis.com/css?family=Lobster&display=swap" rel="stylesheet">
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    /* Use the original pink gradient background */
+    body {
+      font-family: 'Lobster', cursive;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    }
+    /* Container for the question */
+    .container {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      max-width: 90%;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      color: #e63946;
+    }
+    /* Buttons container: set as inline-block with relative positioning so that its width stays fixed */
+    .buttons {
+      position: relative;
+      display: inline-block;
+    }
+    /* Basic button styling */
+    button {
+      font-size: 1.5em;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    button:focus {
+      outline: none;
+    }
+    /* Tak button: initial color and set transform-origin to left center for expansion */
+    #tak {
+      background-color: #e63946;
+      color: #fff;
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: left center;
+    }
+    #tak:hover {
+      background-color: #d62828;
+    }
+    /* Nie button: initial color and positioned to the right; its position will be set in JS */
+    #nie {
+      background-color: #6c757d;
+      color: #fff;
+      position: absolute;
+      top: 0;
+    }
+    #nie:hover {
+      background-color: #5a6268;
+    }
+    /* Highlight animation for the Tak button.
+       It pulses from 100% to 120% and back twice.
+       Note: We assume the transform-origin is now center. */
+    @keyframes highlightTak {
+      0% {
+        transform: scale(1);
+        background-color: #e63946;
+      }
+      25% {
+        transform: scale(1.2);
+        background-color: #f06d70;
+      }
+      50% {
+        transform: scale(1);
+        background-color: #e63946;
+      }
+      75% {
+        transform: scale(1.2);
+        background-color: #f06d70;
+      }
+      100% {
+        transform: scale(1);
+        background-color: #e63946;
+      }
+    }
+    .highlight {
+      animation: highlightTak 1s ease-in-out;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.8em;
+      }
+      button {
+        font-size: 1.2em;
+        padding: 8px 16px;
+      }
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Czy zostaniesz moją walentynką?</h1>
+    <div class="buttons" id="btnContainer">
+      <button id="tak">Tak</button>
+      <button id="nie">Nie</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const gap = 20; // gap between buttons
+      const takBtn = document.getElementById("tak");
+      const nieBtn = document.getElementById("nie");
+      const btnContainer = document.getElementById("btnContainer");
+
+      // Measure the natural widths by temporarily removing absolute positioning
+      takBtn.style.position = "static";
+      nieBtn.style.position = "static";
+
+      // Get natural sizes (buttons rendered inline-block)
+      const takWidth = takBtn.offsetWidth;
+      const nieWidth = nieBtn.offsetWidth;
+
+      // Set the container width: tak width + gap + nie width.
+      const containerWidth = takWidth + gap + nieWidth;
+      btnContainer.style.width = containerWidth + "px";
+      btnContainer.style.height = Math.max(takBtn.offsetHeight, nieBtn.offsetHeight) + "px";
+
+      // Now reposition the buttons absolutely within the container:
+      takBtn.style.position = "absolute";
+      takBtn.style.zIndex = "10";
+      takBtn.style.left = "0";
+      takBtn.style.top = "0";
+      // Set explicit width on Tak button for animation:
+      takBtn.style.width = takWidth + "px";
+
+      nieBtn.style.position = "absolute";
+      // Position Nie button at the right edge:
+      nieBtn.style.right = "0";
+      nieBtn.style.top = "0";
+
+      // When "Tak" is clicked, redirect immediately.
+      takBtn.addEventListener("click", function() {
+        window.location.href = "https://media.tenor.com/kqWk7ezzSEYAAAAM/hai.gif";
+      });
+
+      // When "Nie" is clicked, animate the Tak button to expand to cover Nie.
+      nieBtn.addEventListener("click", function() {
+        // Disable both buttons.
+        takBtn.disabled = true;
+        nieBtn.disabled = true;
+
+        // Set a transition on width for Tak button.
+        takBtn.style.transition = "width 0.5s ease";
+
+        // New width for Tak button = container's width.
+        takBtn.style.width = containerWidth + "px";
+
+        // When the expansion transition ends:
+        takBtn.addEventListener("transitionend", function(e) {
+          if (e.propertyName === "width") {
+            // Hide the Nie button.
+            nieBtn.style.display = "none";
+            // Change Tak button's transform origin to center so the highlight scales evenly.
+            takBtn.style.transformOrigin = "center center";
+            // Trigger the highlight animation.
+            takBtn.classList.add("highlight");
+            // Re-enable the Tak button for clicking.
+            takBtn.disabled = false;
+          }
+        }, { once: true });
+      });
+    });
+  </script>
+</body>
+</html>
